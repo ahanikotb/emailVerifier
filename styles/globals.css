@@ -1,7 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+body {
+  overflow: overlay;
+}
 @layer base {
   :root {
     --background: 0 0% 100%;
