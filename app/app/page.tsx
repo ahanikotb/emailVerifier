@@ -152,6 +152,7 @@ const FileDisplayCard = ({ file, token }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={async () => {
                       TopEmailValidator.downloadFile(
                         token,
@@ -164,6 +165,7 @@ const FileDisplayCard = ({ file, token }) => {
                     Valid Only
                   </DropdownMenuItem>
                   <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={async () => {
                       TopEmailValidator.downloadFile(
                         token,
