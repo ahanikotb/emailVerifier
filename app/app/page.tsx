@@ -230,16 +230,17 @@ const FileDisplayCard = ({ file, token }) => {
     </div>
   )
 }
+
 const cleanArray = (arr) => {
   const uniqueArr = arr.filter((item, index) => {
     return (
       index ===
       arr.findIndex((obj) => {
-        return JSON.stringify(obj) === JSON.stringify(item)
+        return obj.SystemFileName === item.SystemFileName
       })
     )
   })
-  return uniqueArr
+  return uniqueArr.sort((a, b) => (a.ID > b.ID ? -1 : a.ID < b.ID ? 1 : 0))
 }
 export default function DashboardPage() {
   const router = useRouter()
@@ -262,7 +263,7 @@ export default function DashboardPage() {
   const uploadCSV = async () => {
     const newFiles = await TopEmailValidator.uploadFile(token, form)
 
-    setFiles(cleanArray(newFiles.reverse()))
+    setFiles(cleanArray(newFiles))
   }
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -317,7 +318,7 @@ export default function DashboardPage() {
   const { getRootProps, getInputProps } = useDropzone({ onDrop })
   useEffect(() => {
     TopEmailValidator.getFiles(token).then((res) => {
-      setFiles(cleanArray(res.reverse()))
+      setFiles(cleanArray(res))
       setLoading(false)
     })
   }, [])
