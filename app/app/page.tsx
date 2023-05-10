@@ -19,8 +19,18 @@ import { useDropzone } from "react-dropzone"
 import { useSelector } from "react-redux"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import "react-dropzone-uploader/dist/styles.css"
+import { set } from "date-fns"
+
 import TopEmailValidator from "@/lib/top_validator"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -84,14 +94,12 @@ const FileDisplayCard = ({ file, token }) => {
           // console.log(res)
           setProgress(Number(res.PercentageDone))
           if (res.Status == "Done") {
+            clearInterval(interval)
+
             setFileState((prev) => ({
               ...prev,
-              VerificationStatus: {
-                ...fileState.VerificationStatus,
-                Status: "Done",
-              },
+              VerificationStatus: res,
             }))
-            clearInterval(interval)
           }
         })
       }, 10000)
@@ -128,17 +136,47 @@ const FileDisplayCard = ({ file, token }) => {
           <div className="flex justify-between">Rows: {file.Rows}</div>
           <div>
             {fileState.VerificationStatus.Status == "Done" ? (
-              <Button variant="ghost">
-                <DownloadIcon
-                  onClick={async () => {
-                    TopEmailValidator.downloadFile(
-                      token,
-                      fileState.ID,
-                      fileState.FileName.split(".")[0] + "_verified.csv"
-                    )
-                  }}
-                ></DownloadIcon>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="outline-0">
+                  <Button variant="ghost">
+                    <DownloadIcon
+                    // onClick={async () => {
+                    //   TopEmailValidator.downloadFile(
+                    //     token,
+                    //     fileState.ID,
+                    //     fileState.FileName.split(".")[0] + "_verified.csv"
+                    //   )
+                    // }}
+                    ></DownloadIcon>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      TopEmailValidator.downloadFile(
+                        token,
+                        fileState.ID,
+                        fileState.FileName.split(".")[0] + "_verified.csv",
+                        true
+                      )
+                    }}
+                  >
+                    Valid Only
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      TopEmailValidator.downloadFile(
+                        token,
+                        fileState.ID,
+                        fileState.FileName.split(".")[0] + "_verified.csv",
+                        false
+                      )
+                    }}
+                  >
+                    All Results
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : fileState.VerificationStatus.Status == "Verifying" ? (
               <Button variant="ghost" disabled>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -190,7 +228,17 @@ const FileDisplayCard = ({ file, token }) => {
     </div>
   )
 }
-
+const cleanArray = (arr) => {
+  const uniqueArr = arr.filter((item, index) => {
+    return (
+      index ===
+      arr.findIndex((obj) => {
+        return JSON.stringify(obj) === JSON.stringify(item)
+      })
+    )
+  })
+  return uniqueArr
+}
 export default function DashboardPage() {
   const router = useRouter()
   const { token, userData } = useSelector((state: RootState) => state.user)
@@ -199,6 +247,7 @@ export default function DashboardPage() {
   const [headers, setHeaders] = useState([])
   const [files, setFiles] = useState([])
   const [uploading, setUploading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const [form, setForm] = useState({
     file: "",
@@ -211,7 +260,7 @@ export default function DashboardPage() {
   const uploadCSV = async () => {
     const newFiles = await TopEmailValidator.uploadFile(token, form)
 
-    setFiles(newFiles.reverse())
+    setFiles(cleanArray(newFiles.reverse()))
   }
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -266,9 +315,11 @@ export default function DashboardPage() {
   const { getRootProps, getInputProps } = useDropzone({ onDrop })
   useEffect(() => {
     TopEmailValidator.getFiles(token).then((res) => {
-      setFiles(res.reverse())
+      setFiles(cleanArray(res.reverse()))
+      setLoading(false)
     })
   }, [])
+
   return (
     <>
       {" "}
@@ -513,12 +564,12 @@ export default function DashboardPage() {
             }}
             size="lg"
           >
-            Import
+            Add List
           </Button>
         </div>
       ) : (
         <div>
-          <div className="w-[80vw] mx-auto flex justify-center items-center my-10">
+          <div className="mx-auto my-10 flex w-[80vw] items-center justify-center">
             <Button
               onClick={() => {
                 setOpenSheet((prev) => !prev)
@@ -528,7 +579,7 @@ export default function DashboardPage() {
               Add List
             </Button>
           </div>
-          <div className="flex flex-col w-full mx-auto items-center justify-center my-10">
+          <div className="mx-auto my-10 flex w-full flex-col items-center justify-center">
             {files.map((file) => {
               return (
                 <FileDisplayCard file={file} token={token}></FileDisplayCard>

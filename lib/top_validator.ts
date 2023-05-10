@@ -93,7 +93,12 @@ export default class TopEmailValidator {
     const response = await client.get(`/list/${fileId}/start_verification`)
     // return response.data.files;
   }
-  static async downloadFile(token: string, fileId: string, fileName: string) {
+  static async downloadFile(
+    token: string,
+    fileId: string,
+    fileName: string,
+    valid_only: boolean
+  ) {
     const client = axios.create({
       baseURL: BACKENDLINK + "api",
       // timeout: 1000,
@@ -101,7 +106,13 @@ export default class TopEmailValidator {
         "X-API-KEY": token,
       },
     })
-    client.get(`/file/${fileId}/download`).then((response) => {
+
+    let url = `/file/${fileId}/download`
+    if (valid_only) {
+      url = `/file/${fileId}/download_valid`
+    }
+
+    client.get(url).then((response) => {
       const url = window.URL.createObjectURL(new Blob([response.data]))
       const link = document.createElement("a")
       link.href = url
