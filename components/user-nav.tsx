@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation"
 import { logoutUser } from "@/slices/userSlice"
 import { RootState } from "@/store/store"
 import { CreditCard, LogOut, PlusCircle, Settings, User } from "lucide-react"
@@ -19,7 +20,7 @@ import {
 
 export function UserNav() {
   const { token, userData } = useSelector((state: RootState) => state.user)
-
+  const router = useRouter()
   const dispatch = useDispatch()
 
   return (
@@ -69,7 +70,7 @@ export function UserNav() {
         <DropdownMenuItem
           onClick={() => {
             dispatch(logoutUser())
-            // signOut()
+            router.push("/auth")
           }}
         >
           <LogOut className="mr-2 h-4 w-4" />

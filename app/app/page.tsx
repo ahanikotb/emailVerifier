@@ -4,6 +4,7 @@ import React, { use, useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { RootState } from "@/store/store"
 import {
+  AlertCircle,
   Calendar as CalendarIcon,
   Delete,
   DownloadIcon,
@@ -12,6 +13,7 @@ import {
   Mail,
   PlayIcon,
   Plus,
+  Rocket,
   Trash,
 } from "lucide-react"
 import Papa from "papaparse"
@@ -33,6 +35,7 @@ import { set } from "date-fns"
 
 import TopEmailValidator from "@/lib/top_validator"
 import { cn } from "@/lib/utils"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -115,7 +118,7 @@ const FileDisplayCard = ({ file, token }) => {
 
   return (
     <div>
-      <Card className="my-5 w-[600px]">
+      <Card className="my-5 min-w-[450px] max-w-[450px]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">{file.FileName}</CardTitle>
           <CardDescription>
@@ -134,61 +137,72 @@ const FileDisplayCard = ({ file, token }) => {
         </CardContent>
         <CardFooter className="item-center flex justify-between">
           <div className="flex justify-between">Rows: {file.Rows}</div>
-          <div>
+          <div className="flex">
             {fileState.VerificationStatus.Status == "Done" ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="outline-0">
-                  <Button variant="ghost">
-                    <DownloadIcon
-                    // onClick={async () => {
-                    //   TopEmailValidator.downloadFile(
-                    //     token,
-                    //     fileState.ID,
-                    //     fileState.FileName.split(".")[0] + "_verified.csv"
-                    //   )
-                    // }}
-                    ></DownloadIcon>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={async () => {
-                      TopEmailValidator.downloadFile(
-                        token,
-                        fileState.ID,
-                        fileState.FileName.split(".")[0] + "_verified.csv",
-                        true
-                      )
-                    }}
-                  >
-                    Valid Only
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={async () => {
-                      TopEmailValidator.downloadFile(
-                        token,
-                        fileState.ID,
-                        fileState.FileName.split(".")[0] + "_verified.csv",
-                        false
-                      )
-                    }}
-                  >
-                    All Results
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : fileState.VerificationStatus.Status == "Verifying" ? (
-              <Button variant="ghost" disabled>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Button variant="ghost">
+                <Rocket />
               </Button>
             ) : (
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  TopEmailValidator.startVerification(token, fileState.ID).then(
-                    (res) => {
+              ""
+            )}
+
+            <div>
+              {fileState.VerificationStatus.Status == "Done" ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="outline-0">
+                    <Button variant="ghost">
+                      <DownloadIcon
+                      // onClick={async () => {
+                      //   TopEmailValidator.downloadFile(
+                      //     token,
+                      //     fileState.ID,
+                      //     fileState.FileName.split(".")[0] + "_verified.csv"
+                      //   )
+                      // }}
+                      ></DownloadIcon>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={async () => {
+                        TopEmailValidator.downloadFile(
+                          token,
+                          fileState.ID,
+                          fileState.FileName.split(".")[0] + "_verified.csv",
+                          true
+                        )
+                      }}
+                    >
+                      Valid Only
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={async () => {
+                        TopEmailValidator.downloadFile(
+                          token,
+                          fileState.ID,
+                          fileState.FileName.split(".")[0] + "_verified.csv",
+                          false
+                        )
+                      }}
+                    >
+                      All Results
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : fileState.VerificationStatus.Status == "Verifying" ? (
+                <Button variant="ghost" disabled>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    TopEmailValidator.startVerification(
+                      token,
+                      fileState.ID
+                    ).then((res) => {
                       setFileState((prev) => ({
                         ...prev,
                         VerificationStatus: {
@@ -196,34 +210,13 @@ const FileDisplayCard = ({ file, token }) => {
                           Status: "Verifying",
                         },
                       }))
-                    }
-                  )
-                  // .finally(() => {
-                  //   const interval = setInterval(() => {
-                  //     TopEmailValidator.getVerificationStatus(
-                  //       token,
-                  //       file.ID
-                  //     ).then((res) => {
-                  //       // console.log(res)
-                  //       setProgress(Number(res.PercentageDone))
-                  //       if (res.Status == "Done") {
-                  //         setFileState((prev) => ({
-                  //           ...prev,
-                  //           VerificationStatus: {
-                  //             ...fileState.VerificationStatus,
-                  //             Status: "Done",
-                  //           },
-                  //         }))
-                  //         clearInterval(interval)
-                  //       }
-                  //     })
-                  //   }, 5000)
-                  // })
-                }}
-              >
-                <PlayIcon></PlayIcon>
-              </Button>
-            )}
+                    })
+                  }}
+                >
+                  <PlayIcon></PlayIcon>
+                </Button>
+              )}
+            </div>
           </div>
         </CardFooter>
       </Card>
@@ -259,6 +252,7 @@ export default function DashboardPage() {
     email_column_name: "Email",
     domain_column_name: "",
     get_missing_emails: false,
+    brute_force_failed_emails: true,
   })
   const uploadCSV = async () => {
     const newFiles = await TopEmailValidator.uploadFile(token, form)
@@ -342,6 +336,17 @@ export default function DashboardPage() {
       <Button size="lg">Import</Button>
     </SheetTrigger> */}
         <SheetContent size="full">
+          {/* <Alert
+            className="bottom-10 fixed left-1/2 -translate-x-1/2
+            w-3/4"
+            variant="default"
+          >
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Your session has expired. Please log in again.
+            </AlertDescription>
+          </Alert> */}
           <div
             className={cn(
               "h-full",
@@ -587,6 +592,7 @@ export default function DashboardPage() {
               Add List
             </Button>
           </div>
+          {/* <div className="mx-auto my-10 flex w-full flex-col items-center justify-center"> */}
           <div className="mx-auto my-10 flex w-full flex-col items-center justify-center">
             {files.map((file) => {
               return (

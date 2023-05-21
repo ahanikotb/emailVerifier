@@ -23,7 +23,7 @@ export default function Layout({ children }) {
   const router = useRouter()
 
   if (token == "") {
-    router.push("/auth")
+    return router.push("/auth")
   }
   // if (!isAuthenticated()) {
   //   // signIn({
