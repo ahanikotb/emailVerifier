@@ -43,6 +43,10 @@ export default class TopEmailValidator {
     form.append("email_column_name", uploadData.email_column_name)
     form.append("domain_column_name", uploadData.domain_column_name)
     form.append("get_missing_emails", uploadData.get_missing_emails)
+    form.append(
+      "brute_force_failed_emails",
+      uploadData.brute_force_failed_emails
+    )
     form.append("file", uploadData.file, uploadData.file.name)
 
     const response = await client.post("/upload", form, config)
