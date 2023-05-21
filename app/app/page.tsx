@@ -252,7 +252,7 @@ export default function DashboardPage() {
     email_column_name: "Email",
     domain_column_name: "",
     get_missing_emails: false,
-    brute_force_failed_emails: true,
+    brute_force_failed_emails: false,
   })
   const uploadCSV = async () => {
     const newFiles = await TopEmailValidator.uploadFile(token, form)
@@ -538,6 +538,25 @@ export default function DashboardPage() {
                                 </SelectGroup>
                               </SelectContent>
                             </Select>
+                          </div>
+                          <div className="flex items-center justify-between my-5">
+                            <label
+                              htmlFor="terms"
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              Try Finding Failed Emails ?
+                            </label>
+                            <Checkbox
+                              checked={form.brute_force_failed_emails}
+                              onCheckedChange={(v) =>
+                                //@ts-ignore
+                                setForm((prev) => ({
+                                  ...prev,
+                                  brute_force_failed_emails: v,
+                                }))
+                              }
+                              id="terms"
+                            />
                           </div>
                         </>
                       ) : (
