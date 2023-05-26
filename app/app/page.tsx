@@ -253,6 +253,7 @@ export default function DashboardPage() {
     domain_column_name: "",
     get_missing_emails: false,
     brute_force_failed_emails: false,
+    include_generic_emails: false,
   })
   const uploadCSV = async () => {
     const newFiles = await TopEmailValidator.uploadFile(token, form)
@@ -538,6 +539,25 @@ export default function DashboardPage() {
                                 </SelectGroup>
                               </SelectContent>
                             </Select>
+                          </div>
+                          <div className="flex items-center justify-between my-5">
+                            <label
+                              htmlFor="terms"
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              Include Generic Emails ?
+                            </label>
+                            <Checkbox
+                              checked={form.include_generic_emails}
+                              onCheckedChange={(v) =>
+                                //@ts-ignore
+                                setForm((prev) => ({
+                                  ...prev,
+                                  include_generic_emails: v,
+                                }))
+                              }
+                              id="terms"
+                            />
                           </div>
                           <div className="flex items-center justify-between my-5">
                             <label

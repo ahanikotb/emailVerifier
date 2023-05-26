@@ -58,8 +58,8 @@ function LineChart({ data }) {
                   style={{
                     background: dataColor[key],
                     width: `${(data[key] / totalSum) * 100}%`,
-                    //@ts-ignore
-                    borderRadius,
+                    // //@ts-ignore
+                    // borderRadius,
                   }}
                 ></div>
               </TooltipTrigger>
