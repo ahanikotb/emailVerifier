@@ -38,15 +38,19 @@ export default class TopEmailValidator {
       headers: { "Content-Type": "multipart/form-data" },
     }
     const form = new FormData()
-    form.append("first_name_column_name", uploadData.first_name_column_name)
-    form.append("last_name_column_name", uploadData.last_name_column_name)
-    form.append("email_column_name", uploadData.email_column_name)
-    form.append("domain_column_name", uploadData.domain_column_name)
-    form.append("get_missing_emails", uploadData.get_missing_emails)
-    form.append(
-      "brute_force_failed_emails",
-      uploadData.brute_force_failed_emails
-    )
+    for (let key in uploadData) {
+      if (key === "file") continue
+      form.append(key, uploadData[key])
+    }
+    // form.append("first_name_column_name", uploadData.first_name_column_name)
+    // form.append("last_name_column_name", uploadData.last_name_column_name)
+    // form.append("email_column_name", uploadData.email_column_name)
+    // form.append("domain_column_name", uploadData.domain_column_name)
+    // form.append("get_missing_emails", uploadData.get_missing_emails)
+    // form.append(
+    //   "brute_force_failed_emails",
+    //   uploadData.brute_force_failed_emails
+    // )
     form.append("file", uploadData.file, uploadData.file.name)
 
     const response = await client.post("/upload", form, config)
