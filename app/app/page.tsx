@@ -258,7 +258,14 @@ export default function DashboardPage() {
   const uploadCSV = async () => {
     const newFiles = await TopEmailValidator.uploadFile(token, form)
 
-    setFiles(cleanArray(newFiles))
+    //sleep 1 sec
+    await new Promise((r) => setTimeout(r, 1000))
+
+    TopEmailValidator.getFiles(token).then((res) => {
+      setFiles(cleanArray(res))
+    })
+
+    // setFiles(cleanArray(newFiles))
   }
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file) => {
